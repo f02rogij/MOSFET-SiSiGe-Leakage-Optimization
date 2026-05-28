@@ -1,89 +1,149 @@
-Developed for the course "Electrónica Física"
-University of Granada (UGR)
-Academic Year 2025–2026
-
 # MOSFET-SiSiGe-Leakage-Optimization
 
-Simulation and optimization of Si/SiGe superlattice structures for leakage-current reduction in nanoscale NMOS transistors.
+Developed for the course **Electrónica Física**  
+University of Granada (UGR)  
+Academic Year 2025–2026
 
-## Project Description
+---
 
-This project studies the introduction of Si/SiGe quantum-well structures inside the channel of a 15 nm NMOS transistor in order to reduce source-to-drain tunnelling and leakage current in the OFF state.
+## Project Overview
 
-The channel is modeled using a one-dimensional effective-mass approximation. Quantum transport is calculated through the Transfer Matrix Method (TMM), while the leakage current is estimated using the Landauer formalism.
+This project investigates the reduction of OFF-state leakage current in nanoscale NMOS transistors through the introduction of Si/SiGe superlattice structures inside the channel.
 
-The geometrical dimensions of the Si and SiGe regions are optimized using the Sequential Least Squares Programming (SLSQP) algorithm.
+The device is modeled using a one-dimensional quantum transport approach based on the effective mass approximation. Electron transmission through the channel is computed using the Transfer Matrix Method (TMM), while the leakage current is evaluated using the Landauer formalism with Fermi–Dirac statistics.
+
+The geometrical dimensions of the Si and SiGe regions are automatically optimized using the Sequential Least Squares Programming (SLSQP) algorithm.
+
+---
 
 ## Physical Model
 
-Operating conditions:
+### Device Parameters
 
-- Channel length: 15 nm
-- Temperature: 300 K
-- OFF state:
-  - VGS = 0 V
-  - VDS = 0.7 V
+- NMOS channel length: 15 nm
+- OFF-state operation:
+  - \(V_{GS} = 0\) V
+  - \(V_{DS} = 0.7\) V
+- Temperature:
+  - 358 K (85 °C)
 
-Materials:
+### Materials
 
-- Silicon (Si):
-  - Effective channel potential: 0.30 eV
-- Silicon-Germanium (SiGe):
-  - Effective barrier potential: 0.45 eV
+| Material | Effective Potential | Effective Mass |
+|---|---|---|
+| Si | 0.30 eV | \(0.19\,m_0\) |
+| SiGe | 0.45 eV | \(0.22\,m_0\) |
 
-Transport model:
+The SiGe regions are modeled as conduction-band barriers with an effective offset of:
+
+\[
+\Delta E_c = 0.15\ \mathrm{eV}
+\]
+
+relative to the Si regions.
+
+---
+
+## Quantum Transport Model
+
+The simulation includes:
 
 - Effective mass approximation
-- Transfer Matrix Method
-- Landauer current calculation
+- Position-dependent effective masses
+- BenDaniel–Duke boundary conditions
+- Transfer Matrix Method (TMM)
+- Continuous \(V_{DS}\) potential ramp
+- Landauer transport formalism
 - Fermi–Dirac statistics
+
+The drain-source voltage is not modeled as a simple step potential. Instead, the channel is subdivided into multiple thin slices in order to reproduce a continuous linear voltage drop along the transport direction.
+
+This ensures a physically consistent comparison between the conventional channel and the Si/SiGe superlattice structures.
+
+---
 
 ## Simulated Structures
 
 The following configurations are analyzed:
 
-- N = 0 (conventional Si channel)
-- N = 3 (3 SiGe barriers)
-- N = 5 (5 SiGe barriers)
+| Configuration | Structure |
+|---|---|
+| \(N=0\) | Conventional Si channel |
+| \(N=3\) | 4 Si regions + 3 SiGe barriers |
+| \(N=5\) | 6 Si regions + 5 SiGe barriers |
 
-The optimization algorithm determines the optimal lengths of each Si and SiGe segment while maintaining a fixed total channel length of 15 nm.
+The optimization algorithm determines the optimal segment lengths while enforcing:
+
+\[
+\sum_i L_i = 15\ \mathrm{nm}
+\]
+
+---
 
 ## Optimization
 
-Optimization method:
+### Algorithm
 
 - SLSQP (Sequential Least Squares Programming)
 
-Objective:
+### Objective
 
-- Minimize OFF-state leakage current
+Minimize the OFF-state leakage current:
 
-Constraints:
+\[
+I_N = \frac{2e^2}{h}
+\int
+\left[
+f(E,\mu_S)-f(E,\mu_D)
+\right]
+T(E)\,dE
+\]
 
-- Total channel length = 15 nm
+### Constraints
+
+- Total channel length fixed to 15 nm
 - Positive segment lengths
-- Minimum segment length = 0.5 nm
-- Maximum segment length = 8 nm
+- Minimum segment size: 0.5 nm
+- Multiple random initializations to reduce local-minimum trapping
+
+---
 
 ## Generated Results
 
-The code produces:
+The program automatically generates:
 
-- Optimized channel geometries
-- Potential profiles
-- Transmission spectra
+- Optimized Si/SiGe geometries
+- Potential profiles \(U(x)\)
+- Quantum transmission spectra \(T(E)\)
 - Landauer current estimates
 - Leakage-current reduction percentages
+- Publication-ready figures
 
-## Repository Contents
+---
+
+## Repository Structure
 
 ```text
-main.py
+sige_nmos_optimizer_3.py
 README.md
-resultados_SiSiGe_perfil_potencial.png
-resultados_SiSiGe_transmision.png
-resultados_SiSiGe_tabla.png
+fotos/
+├── resultados_SiSiGe_tabla.png
+├── resultados_SiSiGe_perfil_potencial.png
+└── resultados_SiSiGe_transmision.png
 ```
+
+---
+
+## Main Features of the Code
+
+- Vectorized TMM implementation
+- Different effective masses in each material
+- Continuous electrostatic potential profile
+- Automatic constrained optimization
+- Numerical stability for evanescent states
+- Fully reproducible simulations
+
+---
 
 ## Authors
 
@@ -91,16 +151,18 @@ resultados_SiSiGe_tabla.png
 - José Domínguez González
 - José Rosa Girona
 
+---
+
 ## References
 
-1. J. H. Davies,
-   *The Physics of Low-Dimensional Semiconductors: An Introduction*,
+1. J. H. Davies,  
+   *The Physics of Low-Dimensional Semiconductors: An Introduction*,  
    Cambridge University Press, 1998.
 
-2. nanoHUB.org,
-   *Periodic Complex Potential Barrier Tool (PCPBT)*,
+2. nanoHUB.org,  
+   *Periodic Complex Potential Barrier Tool (PCPBT)*,  
    https://nanohub.org/tools/pcpbt
 
-3. D. Kraft,
-   *A Software Package for Sequential Quadratic Programming*,
+3. D. Kraft,  
+   *A Software Package for Sequential Quadratic Programming*,  
    DLR, 1988.
